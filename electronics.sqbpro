@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="/Users/macbookpro/Downloads/electronics.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="browser query structure pragmas" current="1"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="1715"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><current_table name="4,6:mainevents"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="events" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_"><sort/><column_widths><column index="1" value="449"/><column index="2" value="107"/><column index="3" value="179"/><column index="4" value="485"/><column index="5" value="300"/><column index="6" value="120"/><column index="7" value="160"/><column index="8" value="491"/><column index="9" value="300"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter><filter value="1515915625596046461"/></global_filter></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1">-- select ROUND(MIN(price), 2), ROUND(MAX(price), 2), ROUND(AVG(price), 2)
+-- from events
+-- where event_type = 'purchase'
+-- group by event_type
+
+-- select brand, COUNT(*) as c
+-- from events
+-- where event_type = 'purchase'
+-- group by brand
+-- order by c DESC
+-- limit 10
+
+-- select brand, ROUND((COUNT(*)*100.0)/(select COUNT(*) from events), 1) as p
+-- from events
+-- group by brand
+-- order by p DESC
+-- limit 10
+
+-- select substr(category_code, 1, instr(category_code, '.') - 1) as c, 
+-- 		COUNT(*) as t, 
+-- 		ROUND((COUNT(*)*100.0)/(select COUNT(*) from events), 1) as p
+-- from events
+-- group by c
+-- order by t DESC
+-- limit 10
+
+-- select COUNT(*) as c
+-- from events 
+-- where user_session &lt;&gt; ''
+-- group by user_session
+-- order by c DESC
+-- limit 10
+
+-- select COUNT(*) as c
+-- from events 
+-- where user_session &lt;&gt; '' and event_type not in ('cart', 'purchase')
+-- group by user_session
+-- order by c DESC
+-- limit 10
+
+-- select
+--   user_id,
+--   COUNT(*) as c
+-- from (select distinct user_id, user_session
+-- 		from events
+-- 		where event_type = 'purchase')
+-- group by user_id
+-- order by c DESC
+
+-- select user_id, count(*) as count
+-- from events
+-- where event_type = 'purchase'
+-- group by user_id
+-- order by count DESC
+-- limit 10
+
+-- select
+-- 	e1.product_id as p1,
+-- 	e1.category_code as c1,
+-- 	e2.product_id as p2,
+-- 	e2.category_code as c2,
+-- 	COUNT(*) as c
+-- from events as e1
+-- inner join events as e2
+-- 	on e1.user_session = e2.user_session
+-- 	and e1.category_code &lt;&gt; ''
+-- 	and e2.category_code &lt;&gt; ''
+-- 	and e1.event_type = 'purchase'
+-- 	and e2.event_type = 'purchase'
+-- 	and e1.product_id &lt; e2.product_id
+-- group by e1.product_id, e1.category_code, e2.product_id, e2.category_code
+-- order by c DESC
+-- limit 10
+
+-- select
+--   strftime('%Y-%m-%d', event_time) AS d,
+--   ROUND(SUM(price), 2) AS t,
+--   COUNT(*) as c
+-- from events
+-- where event_type = 'purchase'
+-- group by user_session
+-- order by t DESC
+-- limit 10
+
+-- select
+--   user_id,
+--   COUNT(*) as c
+-- from (select distinct user_id, user_session from events)
+-- group by user_id
+-- order by c DESC
+
+-- select distinct user_id, user_session
+-- from events
+-- order by user_id
+-- group by user_id
+
+-- select COUNT(*) as c
+-- from events 
+-- where user_session &lt;&gt; '' and event_type not in ('cart', 'purchase')
+-- group by user_session
+-- order by c DESC
+-- limit 10
+
+-- select strftime('%H', event_time) as h, COUNT(*) as c
+-- from events
+-- where event_type = 'purchase'
+-- group by h
+-- order by h
+
+-- select strftime('%w', event_time) as h, COUNT(*) as c
+-- from events
+-- where event_type = 'purchase'
+-- group by h
+-- order by h
+
+-- select
+--   strftime('%Y-%m-%d', event_time) as d,
+--   SUM(CAST(price as DECIMAL(10,2))) as t,
+--   COUNT(*) as c
+-- from events
+-- where event_type = 'cart'
+-- and user_session not in (
+--   select e.user_session
+--   from events as e
+--   where e.user_session = events.user_session
+--   and e.event_type = 'purchase'
+-- )
+-- group by user_session
+-- order by t DESC
+-- limit 10
+-- 
+-- select COUNT(*)
+-- from (
+--   select distinct user_id
+--   from events
+--   where event_type = 'cart'
+--   and user_id not in (
+--       select user_id
+--       from events AS e
+--       where e.user_id = events.user_id
+--       and e.event_type = 'purchase')
+-- ) 
+
+-- select e1.product_id, e1.category_code, COUNT(*) as c
+-- from events as e1
+-- where e1.event_type = 'cart'
+-- and not exists (
+--   select 1
+--   from events as e2
+--   where e2.product_id = e1.product_id
+--     and e2.event_type = 'purchase'
+-- )
+-- group by e1.product_id
+-- order by c DESC
+-- limit 10
+
+-- select distinct user_id
+-- from events
+-- where event_type = 'purchase'
+-- group by user_id
+-- having COUNT(distinct product_id) = 1 and COUNT(distinct brand) = 1
+
+with views as (
+  select user_id, product_id, brand,
+		 MIN(strftime('%Y-%m-%d %H:%M:%S', event_time)) as view_time
+  from events
+  where event_type = 'view'
+  group by user_id, product_id
+),
+purchases as (
+  select user_id, product_id, brand,
+		 MIN(strftime('%Y-%m-%d %H:%M:%S', event_time)) as purchase_time
+  from events
+  where event_type = 'purchase'
+  group by user_id, product_id
+)
+select
+  v.user_id,
+  JULIANDAY(p.purchase_time) - JULIANDAY(v.view_time) as time_to_purchase
+from views as v
+inner join purchases as p
+  on v.user_id = p.user_id
+  and v.product_id = p.product_id
+  and v.brand = p.brand
+group by v.user_id
+order by time_to_purchase DESC
+limit 10 </sql><current_tab id="0"/></tab_sql></sqlb_project>
